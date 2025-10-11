@@ -27,6 +27,8 @@ public class AuthenticationController {
             @RequestBody SigninRequest request,
             HttpServletResponse response
     ) {
+        System.out.println("🟢 /api/v1/auth/signin endpoint hit for email: " + request.getEmail());
+
         JwtAuthenticationResponse jwtResponse = authenticationService.SignIn(request);
 
         response.setHeader("Access-Control-Expose-Headers", "Authorization");

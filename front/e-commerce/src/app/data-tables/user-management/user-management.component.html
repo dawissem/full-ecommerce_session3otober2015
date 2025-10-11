@@ -1,0 +1,266 @@
+<div class="row">
+  <div class="col-12">
+    <div class="content-header">User Management</div>
+    <p class="content-sub-header">Manage all system users</p>
+  </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row match-height">
+  <div class="col-xl-4 col-lg-6 col-md-12">
+    <div class="card">
+      <div class="card-content">
+        <div class="card-body">
+          <div class="media">
+            <div class="media-body text-left">
+              <h3 class="mb-1 primary">{{stats.totalUsers}}</h3>
+              <span>Total Users</span>
+            </div>
+            <div class="media-right align-self-center">
+              <i class="ft-users font-large-1 primary"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-lg-6 col-md-12">
+    <div class="card">
+      <div class="card-content">
+        <div class="card-body">
+          <div class="media">
+            <div class="media-body text-left">
+              <h3 class="mb-1 success">{{stats.verifiedUsers}}</h3>
+              <span>Verified Users</span>
+            </div>
+            <div class="media-right align-self-center">
+              <i class="ft-check-circle font-large-1 success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-lg-6 col-md-12">
+    <div class="card">
+      <div class="card-content">
+        <div class="card-body">
+          <div class="media">
+            <div class="media-body text-left">
+              <h3 class="mb-1 warning">{{stats.unverifiedUsers}}</h3>
+              <span>Unverified Users</span>
+            </div>
+            <div class="media-right align-self-center">
+              <i class="ft-alert-circle font-large-1 warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">All Users</h4>
+        <a class="heading-elements-toggle"><i class="ft-more-horizontal font-medium-3"></i></a>
+        <div class="heading-elements">
+          <button class="btn btn-primary btn-sm" (click)="refresh()">
+            <i class="ft-rotate-cw"></i> Refresh
+          </button>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-body">
+          <!-- Search -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search users..."
+                (keyup)="filterUpdate($event)"
+              />
+            </div>
+          </div>
+
+          <!-- Datatable -->
+          <ngx-datatable
+            #table
+            class="bootstrap core-bootstrap"
+            [columnMode]="'force'"
+            [headerHeight]="50"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [limit]="page.pageSize"
+            [rows]="rows"
+            [scrollbarH]="true"
+          >
+            <!-- ID Column -->
+            <ngx-datatable-column name="ID" prop="id" [width]="60"></ngx-datatable-column>
+
+            <!-- Full Name Column -->
+            <ngx-datatable-column name="Name" prop="fullName" [width]="200">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]">
+                  <strong>{{ row.fullName }}</strong>
+                </div>
+                <div *ngIf="editing[row.id]" class="d-flex">
+                  <input 
+                    type="text" 
+                    class="form-control form-control-sm mr-1" 
+                    [(ngModel)]="editingUser[row.id].firstName"
+                    placeholder="First Name"
+                    style="width: 100px;"
+                  />
+                  <input 
+                    type="text" 
+                    class="form-control form-control-sm" 
+                    [(ngModel)]="editingUser[row.id].lastName"
+                    placeholder="Last Name"
+                    style="width: 100px;"
+                  />
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Email Column -->
+            <ngx-datatable-column name="Email" prop="email" [width]="220">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]">
+                  {{ row.email }}
+                </div>
+                <div *ngIf="editing[row.id]">
+                  <input 
+                    type="email" 
+                    class="form-control form-control-sm" 
+                    [(ngModel)]="editingUser[row.id].email"
+                  />
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Role Column -->
+            <ngx-datatable-column name="Role" prop="role" [width]="120">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]">
+                  <span class="badge badge-info">{{ row.role }}</span>
+                </div>
+                <div *ngIf="editing[row.id]">
+                  <select class="form-control form-control-sm" [(ngModel)]="editingUser[row.id].role">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="CUSTOMER">CUSTOMER</option>
+                    <option value="VENDOR">VENDOR</option>
+                  </select>
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Verified Column -->
+            <ngx-datatable-column name="Verified" prop="isVerified" [width]="100">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]">
+                  <span [class]="'badge ' + getVerifiedBadge(row.isVerified)">
+                    {{ row.isVerified ? 'Verified' : 'Unverified' }}
+                  </span>
+                </div>
+                <div *ngIf="editing[row.id]">
+                  <div class="custom-control custom-checkbox">
+                    <input 
+                      type="checkbox" 
+                      class="custom-control-input" 
+                      [id]="'verified-' + row.id"
+                      [(ngModel)]="editingUser[row.id].isVerified"
+                    />
+                    <label class="custom-control-label" [for]="'verified-' + row.id">Verified</label>
+                  </div>
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Status Column -->
+            <ngx-datatable-column name="Status" prop="isEnabled" [width]="100">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]">
+                  <span [class]="'badge ' + getStatusBadge(row.isEnabled)">
+                    {{ row.isEnabled ? 'Active' : 'Disabled' }}
+                  </span>
+                </div>
+                <div *ngIf="editing[row.id]">
+                  <div class="custom-control custom-checkbox">
+                    <input 
+                      type="checkbox" 
+                      class="custom-control-input" 
+                      [id]="'enabled-' + row.id"
+                      [(ngModel)]="editingUser[row.id].isEnabled"
+                    />
+                    <label class="custom-control-label" [for]="'enabled-' + row.id">Enabled</label>
+                  </div>
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Created At Column -->
+            <ngx-datatable-column name="Created" prop="createdAt" [width]="150">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <small>{{ row.createdAt | date:'short' }}</small>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Actions Column -->
+            <ngx-datatable-column name="Actions" [sortable]="false" [width]="180">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <div *ngIf="!editing[row.id]" class="d-flex">
+                  <button 
+                    class="btn btn-sm btn-primary mr-1" 
+                    (click)="onEditStart(row)"
+                    title="Edit"
+                  >
+                    <i class="ft-edit"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-warning mr-1" 
+                    (click)="onToggleStatus(row)"
+                    [title]="row.isEnabled ? 'Disable' : 'Enable'"
+                  >
+                    <i [class]="row.isEnabled ? 'ft-x-circle' : 'ft-check-circle'"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="onDelete(row)"
+                    title="Delete"
+                  >
+                    <i class="ft-trash-2"></i>
+                  </button>
+                </div>
+                <div *ngIf="editing[row.id]" class="d-flex">
+                  <button 
+                    class="btn btn-sm btn-success mr-1" 
+                    (click)="onEditSave(row)"
+                    title="Save"
+                  >
+                    <i class="ft-check"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-secondary" 
+                    (click)="onEditCancel(row)"
+                    title="Cancel"
+                  >
+                    <i class="ft-x"></i>
+                  </button>
+                </div>
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-spinner></ngx-spinner>

@@ -2,6 +2,9 @@ package com.sesame.ecommerce.Models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "users",
         uniqueConstraints = {@UniqueConstraint(name = "email", columnNames = "email")}
@@ -51,17 +55,25 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(name = "is_verified", nullable = false)
-    private boolean isVerified = false;
+    private Boolean isVerified = false;  // Changed to Boolean wrapper for consistency
 
     @Column(name = "verification_token")
     private String verificationToken;
 
     @Column(name = "verification_token_expiry")
     private LocalDateTime verificationTokenExpiry;
-    @Builder.Default
 
+    @Builder.Default
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = true;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -69,13 +69,13 @@
             <div class="tab-pane" [ngClass]="{active: activeTab === 'general'}" id="general" role="tabpanel"
               aria-labelledby="general-tab">
               <div class="media">
-                <img src="assets/img/portrait/small/avatar-s-8.png" alt="profile-img" class="rounded mr-3" height="64"
+                <img [src]="userAvatar" alt="profile-img" class="rounded mr-3" height="64"
                   width="64">
                 <div class="media-body">
                   <div class="col-12 d-flex flex-sm-row flex-column justify-content-start px-0 mb-sm-2">
                     <label class="btn btn-sm bg-light-primary mb-sm-0" for="select-files">Upload Photo</label>
-                    <input type="file" id="select-files" hidden>
-                    <button class="btn btn-sm bg-light-secondary ml-sm-2">Reset</button>
+                    <input type="file" id="select-files" hidden (change)="onFileSelected($event)" accept="image/*">
+                    <button type="button" class="btn btn-sm bg-light-secondary ml-sm-2" (click)="resetAvatar()">Reset</button>
                   </div>
                   <p class="text-muted mb-0 mt-1 mt-sm-0">
                     <small>Allowed JPG, GIF or PNG. Max size of 800kB</small>
@@ -97,12 +97,23 @@
                     </div>
                   </div>
                   <div class="col-12 form-group">
-                    <label for="name">Name</label>
+                    <label for="firstName">First Name</label>
                     <div class="controls">
-                      <input type="text" formControlName="name" class="form-control" placeholder="Name"
-                        [ngClass]="{ 'is-invalid': generalFormSubmitted && gf.name.invalid, 'is-valid': generalFormSubmitted && !gf.name.invalid }"
+                      <input type="text" formControlName="firstName" class="form-control" placeholder="First Name"
+                        [ngClass]="{ 'is-invalid': generalFormSubmitted && gf.firstName.invalid, 'is-valid': generalFormSubmitted && !gf.firstName.invalid }"
                         required>
-                      <div *ngIf="generalFormSubmitted && (gf.name.invalid || gf.name.errors?.required)"
+                      <div *ngIf="generalFormSubmitted && (gf.firstName.invalid || gf.firstName.errors?.required)"
+                        class="help-block mt-1 text-danger"> <i class="ft-alert-circle align-middle"></i> This is
+                        required</div>
+                    </div>
+                  </div>
+                  <div class="col-12 form-group">
+                    <label for="lastName">Last Name</label>
+                    <div class="controls">
+                      <input type="text" formControlName="lastName" class="form-control" placeholder="Last Name"
+                        [ngClass]="{ 'is-invalid': generalFormSubmitted && gf.lastName.invalid, 'is-valid': generalFormSubmitted && !gf.lastName.invalid }"
+                        required>
+                      <div *ngIf="generalFormSubmitted && (gf.lastName.invalid || gf.lastName.errors?.required)"
                         class="help-block mt-1 text-danger"> <i class="ft-alert-circle align-middle"></i> This is
                         required</div>
                     </div>
@@ -118,7 +129,7 @@
                         required</div>
                     </div>
                   </div>
-                  <div class="col-12">
+                  <div class="col-12" *ngIf="!currentUser.isVerified">
                     <ngb-alert type="light-warning" class="mb-2" *ngIf="alertVisible" (close)="alertVisible = false">
                       <p class="mb-0">Your email is not confirmed. Please check your inbox.</p>
                       <a href="javascript:;" class="font-weight-bold text-warning">Resend confirmation</a>

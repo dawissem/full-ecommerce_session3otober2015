@@ -8,6 +8,7 @@ import { CustomizerService } from '../services/customizer.service';
 import { UntypedFormControl } from '@angular/forms';
 import { LISTITEMS } from '../data/template-search';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: "app-navbar",
@@ -30,6 +31,10 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   public isCollapsed = true;
   layoutSub: Subscription;
   configSub: Subscription;
+  
+  // User data from token
+  userName: string = 'User';
+  userEmail: string = '';
 
   @ViewChild('search') searchElement: ElementRef;
   @ViewChildren('searchResults') searchResults: QueryList<any>;
@@ -48,7 +53,9 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(public translate: TranslateService,
     private layoutService: LayoutService,
     private router: Router,
-    private configService: ConfigService, private cdr: ChangeDetectorRef) {
+    private configService: ConfigService, 
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService) {
 
     const browserLang: string = translate.getBrowserLang();
     translate.use(browserLang.match(/en|es|pt|de/) ? browserLang : "en");
@@ -70,6 +77,24 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     else {
       this.isSmallScreen = false;
+    }
+    
+    // Load user info from auth service
+    this.loadUserInfo();
+  }
+  
+  /**
+   * Load user information from cookies
+   */
+  loadUserInfo(): void {
+    const username = this.authService.getUsername();
+    const email = this.authService.getEmail();
+    
+    if (username) {
+      this.userName = username;
+    }
+    if (email) {
+      this.userEmail = email;
     }
   }
 
@@ -224,5 +249,13 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleSidebar() {
     this.layoutService.toggleSidebarSmallScreen(this.hideSidebar);
+  }
+
+  /**
+   * Secure logout function
+   * Calls AuthService to clear all tokens and redirect to login
+   */
+  onLogout(): void {
+    this.authService.logout();
   }
 }

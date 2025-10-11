@@ -1,0 +1,91 @@
+.otp-container {
+  padding: 20px 0;
+}
+
+.otp-inputs {
+  gap: 10px;
+}
+
+.otp-box {
+  flex: 1;
+  max-width: 60px;
+}
+
+.otp-input {
+  height: 60px;
+  font-size: 24px;
+  font-weight: bold;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.otp-input:focus {
+  border-color: #7367F0;
+  box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25);
+  outline: none;
+}
+
+.otp-input:not(:placeholder-shown) {
+  border-color: #7367F0;
+  background-color: #f8f9ff;
+}
+
+.auth-height {
+  min-height: 100vh;
+}
+
+.auth-img-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  width: 100%;
+}
+
+@media (max-width: 991px) {
+  .otp-box {
+    max-width: 50px;
+  }
+  
+  .otp-input {
+    height: 50px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 575px) {
+  .otp-inputs {
+    gap: 5px;
+  }
+  
+  .otp-box {
+    max-width: 45px;
+  }
+  
+  .otp-input {
+    height: 45px;
+    font-size: 18px;
+  }
+}
+
+/* Animation for success */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ngb-alert {
+  animation: fadeIn 0.3s ease-in-out;
+}
